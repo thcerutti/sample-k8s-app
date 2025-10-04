@@ -1,7 +1,7 @@
 api:
   image: thcerutti/sample-k8s-app-api
   tag: latest
-  replicas: 2
+  replicas: 1
   resources:
     requests:
       cpu: 100m
@@ -12,7 +12,7 @@ api:
 frontend:
   image: thcerutti/sample-k8s-app-frontend
   tag: latest
-  replicas: 2
+  replicas: 1
   resources:
     requests:
       cpu: 50m
