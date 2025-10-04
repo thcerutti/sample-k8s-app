@@ -89,3 +89,40 @@ npm start
 ```
 
 A API estará disponível em http://localhost:3000
+
+## Imagem Pública da API (CI/CD)
+
+Uma imagem pública da API é construída automaticamente em cada commit na branch `main` via CircleCI.
+
+Repositório Docker Hub:
+
+```
+docker pull thcerutti/sample-k8s-app-api:latest
+```
+
+Também é publicada uma tag com o SHA curto do commit (ex: `thcerutti/sample-k8s-app-api:abc1234`). Use essa tag para implantações imutáveis em produção.
+
+Exemplo para rodar local só a API usando a imagem pública:
+
+```bash
+docker run --rm -p 3000:3000 thcerutti/sample-k8s-app-api:latest
+```
+
+## Deploy no Kubernetes (resumo)
+
+Ver detalhes em `k8s/README.md`. Passo rápido:
+
+```bash
+./deploy.sh          # Usa a imagem pública :latest por padrão
+# ou
+API_IMAGE_TAG=abc1234 ./deploy.sh   # Usa tag específica
+```
+
+O `api-deployment.yaml` referencia `thcerutti/sample-k8s-app-api:latest` (imagePullPolicy: Always). Para promover uma versão específica, edite o manifest ou use um processo de templating (Helm/Kustomize).
+
+## Próximas Melhorias (sugestões)
+
+- Substituir `latest` por tags de commit automaticamente no pipeline.
+- Adicionar scan de vulnerabilidades (Trivy) antes do push.
+- Publicar SBOM (Syft) e digest no summary do build.
+- Adicionar Healthcheck no Dockerfile para melhor observabilidade.

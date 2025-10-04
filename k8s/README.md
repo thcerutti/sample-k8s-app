@@ -16,28 +16,20 @@ Este diretório contém os manifestos Kubernetes para fazer deploy da aplicaçã
 
 1. **Cluster Kubernetes** funcionando (pode ser local com minikube, kind, k3s, etc.)
 2. **kubectl** configurado para acessar o cluster
-3. **Imagem Docker da API** construída e disponível no cluster
+3. **Imagem Docker da API** disponível no Docker Hub: `thcerutti/sample-k8s-app-api`
 
 ## Preparação
 
-### 1. Construir a imagem Docker da API
-
-```bash
-# Na raiz do projeto
 docker build -t sample-k8s-api:latest ./api
+### 1. (Agora) Usar imagem pública
+
+Não é mais necessário construir localmente para deploy padrão. A imagem é publicada pelo pipeline CI em cada commit da `main`.
+
+```
+docker pull thcerutti/sample-k8s-app-api:latest
 ```
 
-### 2. Carregar a imagem no cluster (se estiver usando minikube/kind)
-
-**Para minikube:**
-```bash
-minikube image load sample-k8s-api:latest
-```
-
-**Para kind:**
-```bash
-kind load docker-image sample-k8s-api:latest
-```
+Tags imutáveis de commit também estão disponíveis (ex: `thcerutti/sample-k8s-app-api:<GIT_SHA>`). Prefira usá-las para ambientes de staging/produção.
 
 ## Deploy da Aplicação
 
@@ -48,7 +40,7 @@ kind load docker-image sample-k8s-api:latest
 kubectl apply -f k8s/nginx-configmap.yaml
 kubectl apply -f k8s/frontend-configmap.yaml
 
-# 2. Aplicar Deployments
+# 2. Aplicar Deployments (API usa imagem pública)
 kubectl apply -f k8s/api-deployment.yaml
 kubectl apply -f k8s/frontend-deployment.yaml
 
@@ -158,15 +150,26 @@ kubectl exec -it <pod-frontend> -- cat /etc/nginx/conf.d/default.conf
 
 ### Imagem não encontrada
 
-Certifique-se de que a imagem foi carregada no cluster:
+Verifique conectividade com Docker Hub ou se a tag existe:
 
 ```bash
-# Para minikube
-minikube image ls | grep sample-k8s-api
-
-# Para kind
-docker exec -it <kind-node> crictl images | grep sample-k8s-api
+docker pull thcerutti/sample-k8s-app-api:latest
+docker pull thcerutti/sample-k8s-app-api:<TAG>
 ```
+
+Se quiser testar rapidamente uma tag específica, edite `api-deployment.yaml` alterando:
+
+```yaml
+image: thcerutti/sample-k8s-app-api:<TAG>
+```
+e aplique novamente:
+
+```bash
+kubectl apply -f k8s/api-deployment.yaml
+kubectl rollout status deployment/api-deployment
+```
+
+Para automação de substituição de tag (Helm ou Kustomize) é recomendado padronizar via pipeline (ver sugestões no README raiz).
 
 ## Monitoramento
 

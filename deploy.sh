@@ -20,21 +20,14 @@ fi
 
 echo "✅ Conectado ao cluster Kubernetes"
 
-# Construir imagem Docker da API
-echo "🔨 Construindo imagem Docker da API..."
-docker build -t sample-k8s-api:latest ./api
+API_IMAGE_REPO="thcerutti/sample-k8s-app-api"
+API_IMAGE_TAG="${API_IMAGE_TAG:-latest}"
+FULL_API_IMAGE="${API_IMAGE_REPO}:${API_IMAGE_TAG}"
 
-# Detectar o tipo de cluster e carregar a imagem
-if kubectl config current-context | grep -q "minikube"; then
-    echo "📦 Carregando imagem no Minikube..."
-    minikube image load sample-k8s-api:latest
-elif kubectl config current-context | grep -q "kind"; then
-    echo "📦 Carregando imagem no Kind..."
-    kind load docker-image sample-k8s-api:latest
-else
-    echo "⚠️  Cluster detectado: $(kubectl config current-context)"
-    echo "   Certifique-se de que a imagem sample-k8s-api:latest está disponível no cluster"
-fi
+echo "🖼  Usando imagem pública da API: $FULL_API_IMAGE"
+echo "    (Defina API_IMAGE_TAG=<tag> para usar uma tag específica, ex: curto SHA do commit)"
+
+echo "ℹ️  Nenhum build local será feito; imagem deve existir no Docker Hub."
 
 # Aplicar manifestos Kubernetes
 echo "📋 Aplicando manifestos Kubernetes..."
@@ -49,7 +42,7 @@ echo "  • ConfigMaps..."
 kubectl apply -n "$NAMESPACE" -f k8s/nginx-configmap.yaml
 kubectl apply -n "$NAMESPACE" -f k8s/frontend-configmap.yaml
 
-echo "  • Deployments..."
+echo "  • Deployments... (API -> $FULL_API_IMAGE)"
 kubectl apply -n "$NAMESPACE" -f k8s/api-deployment.yaml
 kubectl apply -n "$NAMESPACE" -f k8s/frontend-deployment.yaml
 

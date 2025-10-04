@@ -17,9 +17,9 @@ spec:
     spec:
       containers:
       - name: api
-        image: sample-k8s-api:latest
-        # Garante que o cluster tente usar a imagem já presente no node (ex: carregada via minikube image load)
-        imagePullPolicy: IfNotPresent
+        image: thcerutti/sample-k8s-app-api:latest
+        # Imagem pública construída via CI. Use tag de commit para releases imutáveis (ex: :<GIT_SHA>).
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
         env:
