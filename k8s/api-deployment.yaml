@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  namespace: sample-k8s-app
+  labels:
+    app: sample-k8s-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sample-k8s-api
+  template:
+    metadata:
+      labels:
+        app: sample-k8s-api
+    spec:
+      containers:
+      - name: api
+        image: sample-k8s-api:latest
+        # Garante que o cluster tente usar a imagem já presente no node (ex: carregada via minikube image load)
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3000"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5

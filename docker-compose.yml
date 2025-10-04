@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # API Service
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: sample-k8s-api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Frontend Service (usando nginx para servir arquivos estáticos)
+  frontend:
+    image: nginx:alpine
+    container_name: sample-k8s-frontend
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

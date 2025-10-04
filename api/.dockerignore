@@ -1,0 +1,21 @@
+# Ignore Docker files
+Dockerfile
+docker-compose.yml
+docker-compose.yaml
+
+# Ignore node modules (if any JS code)
+node_modules/
+
+# Ignore IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore Git files
+.git/
+.gitignore
