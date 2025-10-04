@@ -110,22 +110,6 @@ docker run --rm -p 3000:3000 thcerutti/sample-k8s-app-api:latest
 
 ## Deploy no Kubernetes (resumo)
 
-### Como acessar localmente via port-forward
-
-Após instalar o Helm chart, execute os comandos abaixo para expor as portas dos serviços no seu ambiente local:
-
-```bash
-# Frontend
-kubectl -n sample-k8s-app port-forward service/frontend-service 8080:80
-
-# API
-kubectl -n sample-k8s-app port-forward service/api-service 3000:3000
-```
-
-Acesse:
-- Frontend: http://localhost:8080
-- API: http://localhost:3000
-
 ### Deploy simplificado com Helm
 
 Agora você pode instalar toda a aplicação com Helm:
@@ -155,6 +139,22 @@ helm uninstall sample-k8s-app -n sample-k8s-app
 ```
 
 Consulte `charts/sample-k8s-app/values.yaml` para todos os parâmetros disponíveis.
+
+### Como acessar localmente via port-forward
+
+Após instalar o Helm chart, execute os comandos abaixo para expor as portas dos serviços no seu ambiente local:
+
+```bash
+# Frontend
+kubectl -n sample-k8s-app port-forward service/frontend-service 8080:80
+
+# API
+kubectl -n sample-k8s-app port-forward service/api-service 3000:3000
+```
+
+Acesse:
+- Frontend: http://localhost:8080
+- API: http://localhost:3000
 
 ## Próximas Melhorias (sugestões)
 
