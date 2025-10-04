@@ -30,8 +30,7 @@ jobs:
       DOCKER_BUILDKIT: 1
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 24.0.7
+      - setup_remote_docker
       - run:
           name: Docker version
           command: docker version
@@ -50,7 +49,12 @@ jobs:
       - run:
           name: Build imagem API
           command: |
-            docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:${GIT_SHA} ./api
+            echo "Usando buildkit=$DOCKER_BUILDKIT"
+            docker build \
+              --progress=plain \
+              -t $IMAGE_NAME:latest \
+              -t $IMAGE_NAME:${GIT_SHA} \
+              ./api
       - run:
           name: Push imagens
           command: |
