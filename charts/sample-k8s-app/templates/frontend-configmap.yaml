@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-files
+  labels:
+    app: sample-k8s-frontend
+data:
+  index.html: |
+    {{- .Files.Get "frontend/index.html" | nindent 4 }}
+  requests.js: |
+    {{- .Files.Get "frontend/requests.js" | nindent 4 }}

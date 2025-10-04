@@ -1,0 +1,25 @@
+api:
+  image: thcerutti/sample-k8s-app-api
+  tag: latest
+  replicas: 2
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+frontend:
+  image: thcerutti/sample-k8s-app-frontend
+  tag: latest
+  replicas: 2
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+ingress:
+  enabled: false
+  host: sample-k8s-app.local

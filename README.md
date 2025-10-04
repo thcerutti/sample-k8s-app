@@ -110,15 +110,35 @@ docker run --rm -p 3000:3000 thcerutti/sample-k8s-app-api:latest
 
 ## Deploy no Kubernetes (resumo)
 
-Ver detalhes em `k8s/README.md`. Passo rápido:
+### Deploy simplificado com Helm
+
+Agora você pode instalar toda a aplicação com Helm:
 
 ```bash
-./deploy.sh          # Usa a imagem pública :latest por padrão
-# ou
-API_IMAGE_TAG=abc1234 ./deploy.sh   # Usa tag específica
+helm install sample-k8s-app ./charts/sample-k8s-app -n sample-k8s-app --create-namespace
 ```
 
-O `api-deployment.yaml` referencia `thcerutti/sample-k8s-app-api:latest` (imagePullPolicy: Always). Para promover uma versão específica, edite o manifest ou use um processo de templating (Helm/Kustomize).
+Para atualizar a imagem da API para uma tag específica:
+
+```bash
+helm upgrade sample-k8s-app ./charts/sample-k8s-app -n sample-k8s-app \
+   --set api.tag=abc1234
+```
+
+Para ativar o Ingress e customizar o host:
+
+```bash
+helm upgrade sample-k8s-app ./charts/sample-k8s-app -n sample-k8s-app \
+   --set ingress.enabled=true --set ingress.host=meusite.local
+```
+
+Para remover tudo:
+
+```bash
+helm uninstall sample-k8s-app -n sample-k8s-app
+```
+
+Consulte `charts/sample-k8s-app/values.yaml` para todos os parâmetros disponíveis.
 
 ## Próximas Melhorias (sugestões)
 

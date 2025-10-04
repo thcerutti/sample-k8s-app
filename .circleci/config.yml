@@ -66,6 +66,50 @@ jobs:
             echo "Pushed $IMAGE_NAME:latest"
             echo "Pushed $IMAGE_NAME:${GIT_SHA}"
 
+  build-and-push-frontend:
+    docker:
+      - image: cimg/base:stable
+    environment:
+      IMAGE_NAME: thcerutti/sample-k8s-app-frontend
+      DOCKER_BUILDKIT: 1
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Docker version
+          command: docker version
+      - run:
+          name: Login Docker Hub
+          command: |
+            [ -n "$DOCKERHUB_USERNAME" ] || { echo "DOCKERHUB_USERNAME ausente"; exit 1; }
+            [ -n "$DOCKERHUB_TOKEN" ] || { echo "DOCKERHUB_TOKEN ausente"; exit 1; }
+            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      - run:
+          name: Calcular tags
+          command: |
+            GIT_SHA=$(git rev-parse --short HEAD)
+            echo "export GIT_SHA=$GIT_SHA" >> $BASH_ENV
+            echo "Tags: $IMAGE_NAME:latest e $IMAGE_NAME:$GIT_SHA"
+      - run:
+          name: Build imagem Frontend
+          command: |
+            echo "Usando buildkit=$DOCKER_BUILDKIT"
+            docker build \
+              --progress=plain \
+              -t $IMAGE_NAME:latest \
+              -t $IMAGE_NAME:${GIT_SHA} \
+              ./frontend
+      - run:
+          name: Push imagens
+          command: |
+            docker push $IMAGE_NAME:latest
+            docker push $IMAGE_NAME:${GIT_SHA}
+      - run:
+          name: Sumário
+          command: |
+            echo "Pushed $IMAGE_NAME:latest"
+            echo "Pushed $IMAGE_NAME:${GIT_SHA}"
+
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/guides/orchestrate/workflows/ & https://circleci.com/docs/reference/configuration-reference/#workflows
 workflows:
@@ -73,6 +117,10 @@ workflows:
   build-and-publish:
     jobs:
       - build-and-push-api:
+          filters:
+            branches:
+              only: main
+      - build-and-push-frontend:
           filters:
             branches:
               only: main
